@@ -55,7 +55,7 @@ struct LinkPreviewDesign: View {
                 if let title = metaData.title {
                     Text(title)
                         .font(.subheadline)
-                        .fontWeight(.semibold)
+                        .fontWeight(.regular)
                         .multilineTextAlignment(.leading)
                         .foregroundColor(primaryFontColor)
                         .lineLimit(titleLineLimit)
