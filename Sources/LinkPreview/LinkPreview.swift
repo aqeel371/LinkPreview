@@ -2,7 +2,7 @@ import SwiftUI
 import LinkPresentation
 
 public struct LinkPreview: View {
-    let url: URL?
+    let url: URLRequest?
     
     @State private var isPresented: Bool = false
     @State private var metaData: LPLinkMetadata? = nil
@@ -13,7 +13,7 @@ public struct LinkPreview: View {
     var titleLineLimit: Int = 3
     var type: LinkPreviewType = .auto
     
-    public init(url: URL?) {
+    public init(url: URLRequest?) {
         self.url = url
     }
     
@@ -21,7 +21,7 @@ public struct LinkPreview: View {
         if let url = url {
             if let metaData = metaData {
                 Button(action: {
-                    if UIApplication.shared.canOpenURL(url) {
+                    if UIApplication.shared.canOpenURL(url.url!) {
                         self.isPresented.toggle()
                     }
                 }, label: {
@@ -29,7 +29,7 @@ public struct LinkPreview: View {
                 })
                     .buttonStyle(LinkButton())
                     .fullScreenCover(isPresented: $isPresented) {
-                        SfSafariView(url: url)
+                        SfSafariView(url: url.url!)
                             .edgesIgnoringSafeArea(.all)
                     }
                     .animation(.spring(), value: metaData)
@@ -39,7 +39,7 @@ public struct LinkPreview: View {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: secondaryFontColor))
                     
-                    Text(url.host ?? "")
+                    Text(url.url!.host ?? "")
                         .font(.caption)
                         .foregroundColor(primaryFontColor)
                 }
@@ -53,24 +53,33 @@ public struct LinkPreview: View {
                     getMetaData(url: url)
                 })
                 .onTapGesture {
-                    if UIApplication.shared.canOpenURL(url) {
+                    if UIApplication.shared.canOpenURL(url.url!) {
                         self.isPresented.toggle()
                     }
                 }
                 .fullScreenCover(isPresented: $isPresented) {
-                    SfSafariView(url: url)
+                    SfSafariView(url: url.url!)
                         .edgesIgnoringSafeArea(.all)
                 }
             }
         }
     }
     
-    func getMetaData(url: URL) {
+    func getMetaData(url: URLRequest) {
         let provider = LPMetadataProvider()
-        provider.startFetchingMetadata(for: url) { meta, err in
-            guard let meta = meta else {return}
-            withAnimation(.spring()) {
-                self.metaData = meta
+        if #available(iOS 15.0, *) {
+            provider.startFetchingMetadata(for: url) { meta, err in
+                guard let meta = meta else {return}
+                withAnimation(.spring()) {
+                    self.metaData = meta
+                }
+            }
+        } else {
+            provider.startFetchingMetadata(for: url.url!) { meta, err in
+                guard let meta = meta else {return}
+                withAnimation(.spring()) {
+                    self.metaData = meta
+                }
             }
         }
     }
