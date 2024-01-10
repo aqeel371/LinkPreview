@@ -1,6 +1,6 @@
 import SwiftUI
 import LinkPresentation
-
+@available(iOS 14.0, *)
 public struct LinkPreview: View {
     let url: URLRequest?
     
