@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 14.0, *)
 extension LinkPreview {
     public func primaryFontColor(_ primaryFontColor: Color) -> LinkPreview {
         var result = self
